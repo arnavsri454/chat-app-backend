@@ -1,8 +1,8 @@
 const express = require('express');
-const mongoose = require('mongoose');
 const cors = require('cors');
 const http = require('http');
 const socketIo = require('socket.io');
+const connectDB = require('./config/db'); // Import MongoDB connection
 require('dotenv').config();
 
 const authRoutes = require('./routes/auth');
@@ -17,24 +17,17 @@ app.use(express.json());
 app.use(cors());
 
 // Connect to MongoDB
-mongoose.connect(process.env.MONGO_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-})
-.then(() => console.log('MongoDB connected'))
-.catch(err => console.error(err));
+connectDB();
 
 // API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/chat', chatRoutes);
 
-// Socket.io for real-time messaging
+// WebSocket for real-time messaging
 io.on('connection', (socket) => {
     console.log('New client connected:', socket.id);
 
-    // Listen for messages sent from clients
     socket.on('sendMessage', (data) => {
-        // Broadcast the message to all connected clients
         io.emit('receiveMessage', data);
     });
 
