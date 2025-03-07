@@ -3,6 +3,7 @@ const cors = require('cors');
 const http = require('http');
 const socketIo = require('socket.io');
 const connectDB = require('./config/db'); 
+const rateLimit = require('express-rate-limit'); // ✅ Import express-rate-limit
 require('dotenv').config();
 
 const authRoutes = require('./routes/auth');
@@ -12,14 +13,26 @@ const app = express();
 const server = http.createServer(app); // Create HTTP server
 const io = socketIo(server, { cors: { origin: '*' } }); // Initialize io properly
 
+// ✅ Enable trust proxy to allow correct rate limiting
+app.set('trust proxy', 1);
+
 const corsOptions = {
-    origin: '*', // Allow all origins
+    origin: 'https://chat-app-frontend-ztmq.onrender.com/', // Allow all origins
     methods: 'GET,POST,PUT,DELETE',
     allowedHeaders: ['Content-Type', 'Authorization']
 };
 
 app.use(cors(corsOptions));
 app.use(express.json());
+
+// ✅ Rate Limiting Middleware
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Limit each IP to 100 requests per window
+  message: "Too many requests, please try again later.",
+});
+
+app.use(limiter); // ✅ Apply rate limiter to all requests
 
 // Connect to MongoDB
 (async () => {
