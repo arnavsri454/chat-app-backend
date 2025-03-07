@@ -13,7 +13,7 @@ const server = http.createServer(app); // Create HTTP server
 const io = socketIo(server, { cors: { origin: '*' } }); // Initialize io properly
 
 const corsOptions = {
-    origin: ['https://chat-app-frontend-ztmq.onrender.com'], // Only allow your frontend
+    origin: '*', // Allow all origins
     methods: 'GET,POST,PUT,DELETE',
     allowedHeaders: ['Content-Type', 'Authorization']
 };
