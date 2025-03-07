@@ -17,7 +17,7 @@ const io = socketIo(server, { cors: { origin: '*' } }); // Initialize io properl
 app.set('trust proxy', 1);
 
 const corsOptions = {
-    origin: 'https://chat-app-frontend-ztmq.onrender.com/', // Allow all origins
+    origin: '*', // Allow all origins
     methods: 'GET,POST,PUT,DELETE',
     allowedHeaders: ['Content-Type', 'Authorization']
 };
