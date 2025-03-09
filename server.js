@@ -11,13 +11,13 @@ const chatRoutes = require('./routes/chat');
 
 const app = express();
 const server = http.createServer(app);
-const io = socketIo(server, { cors: { origin: '*' } });
+const io = socketIo(server, { cors: { origin: '*' } }); // Allows WebSocket connections from any origin
 
-// Enable trust proxy to allow correct rate limiting (needed when behind a proxy)
+// Enable trust proxy (important when behind a proxy, e.g., on Render)
 app.set('trust proxy', 1);
 
 const corsOptions = {
-  origin: '*', // Allow all origins (for production, consider restricting this)
+  origin: '*', // Allow all origins (for production, consider restricting this to your frontend domain)
   methods: 'GET,POST,PUT,DELETE',
   allowedHeaders: ['Content-Type', 'Authorization']
 };
@@ -48,7 +48,7 @@ app.use(limiter);
 app.use('/api/auth', authRoutes);
 app.use('/api/chat', chatRoutes);
 
-// WebSocket
+// WebSocket setup
 io.on('connection', (socket) => {
   console.log('🟢 Client connected:', socket.id);
 
@@ -61,7 +61,7 @@ io.on('connection', (socket) => {
   });
 });
 
-// Make io accessible in other parts if needed
+// Make io accessible in other parts of the app if needed
 app.set('io', io);
 
 const PORT = process.env.PORT || 5000;
