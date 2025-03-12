@@ -2,7 +2,6 @@ const express = require('express');
 const cors = require('cors');
 const http = require('http');
 const socketIo = require('socket.io');
-const path = require('path');
 const connectDB = require('./config/db'); 
 const rateLimit = require('express-rate-limit');
 require('dotenv').config();
@@ -12,13 +11,15 @@ const chatRoutes = require('./routes/chat');
 
 const app = express();
 const server = http.createServer(app);
-const io = socketIo(server, { cors: { origin: '*' } }); // Allows WebSocket connections from any origin
+const io = socketIo(server, { 
+  cors: { origin: "https://chat-app-frontend-ztmq.onrender.com" } // ✅ Allow frontend WebSocket connections
+});
 
 // Enable trust proxy (important when behind a proxy, e.g., on Render)
 app.set('trust proxy', 1);
 
 const corsOptions = {
-  origin: '*', // Allow all origins (for production, consider restricting this to your frontend domain)
+  origin: "https://chat-app-frontend-ztmq.onrender.com", // ✅ Allow only your frontend domain
   methods: 'GET,POST,PUT,DELETE',
   allowedHeaders: ['Content-Type', 'Authorization']
 };
@@ -48,13 +49,6 @@ app.use(limiter);
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/chat', chatRoutes);
-
-// Serve frontend files in production
-app.use(express.static(path.join(__dirname, "build")));
-
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "build", "index.html"));
-});
 
 // WebSocket setup
 io.on('connection', (socket) => {
